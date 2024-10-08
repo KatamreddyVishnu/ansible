@@ -1,0 +1,43 @@
+--- 
+- name: install the tomcat & java on all remote servers
+  hosts: app 
+  become: yes 
+  become_user: root 
+  tasks:
+    - name: task1-install java
+      apt:
+         update_cache: true 
+         name: openjdk-17-jdk
+         state: present 
+    - name: task2-dowmload tomcate bundle
+      get_url:
+        url: https://github.com/lerndevops/code/raw/refs/heads/main/apache-tomcat-9.0.63.tar.gz
+        dest: /opt
+    - name: task3 - extract the zip file
+      unarchive:
+        src: /opt/apache-tomcat-9.0.63.tar.gz
+        remote_src: yes
+        dest: /opt
+    - name: task4 - rename the directory
+      shell: mv /opt/apache-tomcat-9.0.63.tar.gz /opt/tomcat 
+    - name: task5 - create a linux group 
+      group:
+        name: tomact 
+    - name: task6 - create a linux user 
+      user: 
+        name: tomcat
+        group: tomact
+    - name: task7 -update the permission
+      file:
+        path: /opt/tomcat 
+        owner: tomact 
+        group: tomact
+        mode: 0755
+        state: directory
+        recurse: yes
+    - name: task8 -deploy war file to tomcate webapps
+      get_url:
+        url: https://github.com/lerndevops/code/raw/refs/heads/main/sampleapp.war
+        dest: /opt/tomcat/webapps
+    - name: task9 - start the tomcate process
+      shell: bash /opt/tomcat/bin/starrtup.sh
