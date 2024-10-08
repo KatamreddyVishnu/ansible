@@ -1,0 +1,42 @@
+---
+- name: PLAY1 - inatall apache on all remote servers
+  hosts: app
+  become: yes
+  become_user: root
+  tasks:
+    - name: task1 -run apt update
+      apt:
+        update_cache: true
+    - name: task2 -install apache
+      apt:
+        name: apache2
+        state: latest
+    - name: task3 - create a file
+      file:
+        path: /tmp/today.txt
+        state: touch
+    - name: task4 - reset the apache servie
+      systemd:
+        name: apache2
+        state: restarted
+- name: PLAY2 - install mysql on all servers
+  hosts: db
+  become: yes
+  become_user: root
+  tasks:
+    - name: task1 -run apt update
+      apt:
+        update_cache: true
+    - name: task2 install mysql-server
+      apt:
+        name: mysql-server
+        state: latest
+    - name: task3 - create a file
+      file:
+        path: /tmp/mysql.txt
+        state: touch
+    - name: task4 -restart the mysql service
+      systemd:
+        name: mysql
+        state: restarted
+        
